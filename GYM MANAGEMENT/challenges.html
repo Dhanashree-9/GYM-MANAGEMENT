@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenges (User)</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkrX7SaZYyPPwTnDTH30VTx11eSyzfNM4",
+            authDomain: "first-dc645.firebaseapp.com",
+            databaseURL: "https://first-dc645-default-rtdb.firebaseio.com",
+            projectId: "first-dc645",
+            storageBucket: "first-dc645.appspot.com",
+            messagingSenderId: "723518346868",
+            appId: "1:723518346868:web:cebec254c6499ae7aea321"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.fetchChallenges = function () {
+            let userEmail = prompt("Enter your email:").trim();
+            if (!userEmail) {
+                alert("Email is required!");
+                return;
+            }
+
+            let sanitizedEmail = userEmail.replace(/\./g, "_");
+            const challengeList = document.getElementById("challengeList");
+
+            onValue(ref(db, `userChallenges/${sanitizedEmail}`), (snapshot) => {
+                challengeList.innerHTML = "";
+                if (!snapshot.exists()) {
+                    challengeList.innerHTML = "<p>No challenges found.</p>";
+                    return;
+                }
+
+                snapshot.forEach((challengeSnap) => {
+                    let challenge = challengeSnap.val();
+                    let challengeId = challengeSnap.key;
+
+                    let li = document.createElement("li");
+                    li.innerHTML = `<strong>${challenge.name}</strong> - 
+                        <span class="${challenge.accepted ? 'accepted' : 'pending'}">
+                        ${challenge.accepted ? "Accepted ✅" : "Pending ❌"}
+                        </span>
+                        ${!challenge.accepted ? `<button onclick="acceptChallenge('${sanitizedEmail}', '${challengeId}')">Accept</button>` : ""}`;
+                    challengeList.appendChild(li);
+                });
+            });
+        };
+
+        window.acceptChallenge = function (userEmail, challengeId) {
+            let sanitizedEmail = userEmail.replace(/\./g, "_");
+
+            update(ref(db, `userChallenges/${sanitizedEmail}/${challengeId}`), { accepted: true })
+                .then(() => {
+                    alert("Challenge Accepted!");
+                    fetchChallenges();
+                })
+                .catch(error => {
+                    console.error("Error accepting challenge:", error);
+                    alert("Error accepting challenge. See console for details.");
+                });
+        };
+    </script>
+    <style>
+       body { font-family: Arial, sans-serif; background: #222; color: white; text-align: center; padding: 50px; }
+       .container { background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 10px; display: inline-block; width: 50%; text-align: justify; }
+       button { background-color: green; color: white; padding: 10px; border: none; font-size: 16px; border-radius: 5px; cursor: pointer; display: block; margin: 10px auto; }
+       ul { list-style: none; padding: 0; }
+       li { text-align: justify; padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+       .accepted { color: limegreen; font-weight: bold; }
+       .pending { color: orange; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Your Challenges</h2>
+        <button onclick="fetchChallenges()">Load Challenges</button>
+        <ul id="challengeList"></ul>
+    </div>
+</body>
+</html>

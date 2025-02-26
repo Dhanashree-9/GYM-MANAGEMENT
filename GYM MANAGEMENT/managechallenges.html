@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Challenges (Admin)</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkrX7SaZYyPPwTnDTH30VTx11eSyzfNM4",
+            authDomain: "first-dc645.firebaseapp.com",
+            databaseURL: "https://first-dc645-default-rtdb.firebaseio.com",
+            projectId: "first-dc645",
+            storageBucket: "first-dc645.appspot.com",
+            messagingSenderId: "723518346868",
+            appId: "1:723518346868:web:cebec254c6499ae7aea321"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.createChallenge = function () {
+            let challengeName = document.getElementById("challengeName").value.trim();
+            let userEmail = document.getElementById("userEmail").value.trim();
+
+            if (challengeName === "" || userEmail === "") {
+                alert("Please enter both challenge name and user email.");
+                return;
+            }
+
+            let sanitizedEmail = userEmail.replace(/\./g, "_");
+            let challengeRef = push(ref(db, `userChallenges/${sanitizedEmail}`));
+
+            set(challengeRef, { name: challengeName, accepted: false })
+                .then(() => {
+                    document.getElementById("challengeName").value = "";
+                    document.getElementById("userEmail").value = "";
+                    alert("Challenge sent to user!");
+                })
+                .catch(error => {
+                    console.error("Error sending challenge:", error);
+                    alert("Failed to send challenge. Please check console for errors.");
+                });
+        };
+
+        function fetchChallenges() {
+            const challengeList = document.getElementById("challengeList");
+            onValue(ref(db, "userChallenges"), (snapshot) => {
+                challengeList.innerHTML = "";
+                if (!snapshot.exists()) {
+                    challengeList.innerHTML = "<p>No challenges found.</p>";
+                    return;
+                }
+
+                snapshot.forEach((userSnapshot) => {
+                    let userEmail = userSnapshot.key.replace(/_/g, ".");
+                    userSnapshot.forEach((challengeSnap) => {
+                        let challenge = challengeSnap.val();
+                        let li = document.createElement("li");
+                        li.innerHTML = `<strong>${challenge.name}</strong> <br> Assigned to: <span class="highlight">${userEmail}</span> 
+                            <br> Status: <span class="${challenge.accepted ? 'accepted' : 'pending'}">
+                            ${challenge.accepted ? "Accepted ✅" : "Pending ❌"}
+                            </span>`;
+                        challengeList.appendChild(li);
+                    });
+                });
+            });
+        }
+
+        fetchChallenges();
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #222; color: white; text-align: center; padding: 50px; }
+        .container { background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 10px; display: inline-block; width: 50%; text-align: justify; }
+        input, button { padding: 10px; margin: 10px; font-size: 16px; display: block; width: calc(100% - 20px); }
+        button { background-color: red; color: white; border: none; cursor: pointer; border-radius: 5px; }
+        ul { list-style: none; padding: 0; text-align: left; }
+li::before { content: "➜ "; color: limegreen; font-weight: bold; }
+        .accepted { color: limegreen; font-weight: bold; }
+        .pending { color: orange; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create Challenge</h2>
+        <input type="text" id="userEmail" placeholder="Enter User Email">
+        <input type="text" id="challengeName" placeholder="Enter Challenge Name">
+        <button onclick="createChallenge()">Send Challenge</button>
+        <h2>Existing Challenges</h2>
+        <ul id="challengeList"></ul>
+    </div>
+</body>
+</html>

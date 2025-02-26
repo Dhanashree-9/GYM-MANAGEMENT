@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Assign Fee & Track Progress</title>
+    <style>
+      body {
+    font-family: 'Poppins', sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.container:hover {
+    box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+input, select {
+    width: calc(100% - 20px);
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
+    border-color: #28a745;
+    box-shadow: 0px 0px 8px rgba(40, 167, 69, 0.3);
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: 500;
+}
+
+button:hover {
+    background: #218838;
+    transform: scale(1.02);
+}
+
+.progress {
+    margin-top: 20px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.05);
+    text-align: left;
+}
+
+@media (max-width: 480px) {
+    .container {
+        width: 90%;
+        padding: 20px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Assign Fee</h2>
+        <input type="text" id="memberName" placeholder="Enter Name" required>
+        <input type="email" id="memberEmail" placeholder="Enter Email" required>
+        <input type="text" id="memberID" placeholder="Enter ID" required>
+        <input type="number" id="feeAmount" placeholder="Enter Fee Amount" required>
+        <input type="text" id="month" placeholder="Enter Month (e.g., January)" required>
+        <input type="number" id="year" placeholder="Enter Year (e.g., 2025)" required>
+        <select id="status">
+            <option value="Unpaid">Unpaid</option>
+            <option value="Paid">Paid</option>
+        </select>
+        <button onclick="assignFee()">Assign</button>
+
+        <div class="progress" id="progressTracker">No payments recorded yet.</div>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+         // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCkrX7SaZYyPPwTnDTH30VTx11eSyzfNM4",
+    authDomain: "first-dc645.firebaseapp.com",
+    databaseURL: "https://first-dc645-default-rtdb.firebaseio.com",
+    projectId: "first-dc645",
+    storageBucket: "first-dc645.firebasestorage.app",
+    messagingSenderId: "723518346868",
+    appId: "1:723518346868:web:cebec254c6499ae7aea321"
+  };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.assignFee = async function () {
+            let name = document.getElementById("memberName").value;
+            let email = document.getElementById("memberEmail").value.replace(/\./g, ","); // Encode email
+            let id = document.getElementById("memberID").value;
+            let fee = document.getElementById("feeAmount").value;
+            let month = document.getElementById("month").value;
+            let year = document.getElementById("year").value;
+            let status = document.getElementById("status").value;
+
+            if (!name || !email || !id || !fee || !month || !year) {
+                alert("Please enter all details.");
+                return;
+            }
+
+            const feeRef = ref(db, `fees/${email}/${month}_${year}`);
+
+            await set(feeRef, {
+                name, id, fee, month, year, status,
+                timestamp: new Date().toISOString()
+            });
+
+            alert("Fee Assigned Successfully!");
+        };
+
+        function trackProgress() {
+            const progressRef = ref(db, "fees");
+            onValue(progressRef, (snapshot) => {
+                if (!snapshot.exists()) {
+                    document.getElementById("progressTracker").innerText = "No payments recorded yet.";
+                    return;
+                }
+
+                let progressText = "📊 Payment Progress:\n";
+                snapshot.forEach(userSnapshot => {
+                    userSnapshot.forEach(monthSnapshot => {
+                        let data = monthSnapshot.val();
+                        progressText += `${data.name} - ${data.month} ${data.year} → ${data.status} \n`;
+                    });
+                });
+
+                document.getElementById("progressTracker").innerText = progressText;
+            });
+        }
+
+        trackProgress();
+    </script>
+</body>
+</html>

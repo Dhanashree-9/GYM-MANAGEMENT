@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Member</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #222;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        input, button {
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+        input {
+            background: white;
+            color: black;
+        }
+        button {
+            background: green;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: darkgreen;
+        }
+        a {
+            display: block;
+            margin-top: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Update Member</h1>
+        <form id="updateForm">
+            <input type="email" id="email" placeholder="Enter Member Email" required>
+            <input type="text" id="name" placeholder="Enter New Name">
+            <input type="number" id="age" placeholder="Enter New Age">
+            <button type="submit">Update Member</button>
+        </form>
+        <a href="admindashboard.html">Back to Dashboard</a>
+    </div>
+
+    <script>
+        document.getElementById("updateForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            let email = document.getElementById("email").value;
+            let newName = document.getElementById("name").value;
+            let newAge = document.getElementById("age").value;
+            let members = JSON.parse(localStorage.getItem("members")) || [];
+            
+            let memberIndex = members.findIndex(member => member.email === email);
+            if (memberIndex === -1) {
+                alert("No member found with this email!");
+                return;
+            }
+
+            if (newName) members[memberIndex].name = newName;
+            if (newAge) members[memberIndex].age = newAge;
+
+            localStorage.setItem("members", JSON.stringify(members));
+            alert("Member updated successfully!");
+            window.location.href = "history.html";
+        });
+    </script>
+</body>
+</html>

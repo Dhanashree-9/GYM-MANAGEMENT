@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Member</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #222;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            width: 50%;
+            border-radius: 10px;
+        }
+        input, button {
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+        input {
+            background: white;
+            color: black;
+        }
+        button {
+            background: red;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: darkred;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Add New Member</h2>
+        <form id="memberForm">
+            <input type="text" id="name" placeholder="Enter Member Name" required>
+            <input type="email" id="email" placeholder="Enter Member Email" required>
+            <input type="number" id="age" placeholder="Enter Member Age" required>
+            <button type="submit">Add Member</button>
+        </form>
+        <button onclick="goBack()">Back</button>
+    </div>
+
+    <script>
+        document.getElementById("memberForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            let name = document.getElementById("name").value;
+            let email = document.getElementById("email").value;
+            let age = document.getElementById("age").value;
+
+            if (!name || !email || !age) {
+                alert("Please fill in all fields!");
+                return;
+            }
+
+            let newMember = { name, email, age };
+
+            let members = JSON.parse(localStorage.getItem("members")) || [];
+            members.push(newMember);
+            localStorage.setItem("members", JSON.stringify(members));
+
+            alert("New member added successfully!");
+            window.location.href = "history.html";
+        });
+
+        function goBack() {
+            window.location.href = "adminDashboard.html";
+        }
+    </script>
+
+</body>
+</html>

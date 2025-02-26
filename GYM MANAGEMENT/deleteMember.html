@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Member</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #222;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            width: 50%;
+            border-radius: 10px;
+        }
+        input, button {
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+        input {
+            background: white;
+            color: black;
+        }
+        button {
+            background: red;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: darkred;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Delete Member</h2>
+        <form id="deleteForm">
+            <input type="email" id="email" placeholder="Enter Member Email" required>
+            <button type="submit">Delete Member</button>
+        </form>
+        <button onclick="goBack()">Back</button>
+    </div>
+
+    <script>
+        document.getElementById("deleteForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            let email = document.getElementById("email").value;
+            let members = JSON.parse(localStorage.getItem("members")) || [];
+            let deletedMembers = JSON.parse(localStorage.getItem("deletedMembers")) || [];
+
+            let memberToDelete = members.find(member => member.email === email);
+            
+            if (!memberToDelete) {
+                alert("No member found with this email!");
+                return;
+            }
+
+            let updatedMembers = members.filter(member => member.email !== email);
+            deletedMembers.push(memberToDelete); // Add to deleted members history
+
+            localStorage.setItem("members", JSON.stringify(updatedMembers));
+            localStorage.setItem("deletedMembers", JSON.stringify(deletedMembers));
+
+            alert("Member deleted successfully!");
+            window.location.href = "history.html";
+        });
+
+        function goBack() {
+            window.location.href = "adminDashboard.html";
+        }
+    </script>
+
+</body>
+</html>

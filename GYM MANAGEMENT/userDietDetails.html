@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Diet Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            display: inline-block;
+            width: 80%;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            color: white;
+        }
+        th, td {
+            border: 1px solid white;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: darkgreen;
+        }
+        button {
+            background: #00ff88;
+            color: black;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        button:hover {
+            background: #00c6ff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h2>🥗 User Diet Details</h2>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Member Name</th>
+                    <th>Diet Plan</th>
+                    <th>Calories</th>
+                    <th>Meal Timing</th>
+                </tr>
+            </thead>
+            <tbody id="dietList">
+                <!-- Data will be dynamically inserted here -->
+            </tbody>
+        </table>
+        <button onclick="window.location.href='userDashboard.html'">Back to Dashboard</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkrX7SaZYyPPwTnDTH30VTx11eSyzfNM4",
+            authDomain: "first-dc645.firebaseapp.com",
+            databaseURL: "https://first-dc645-default-rtdb.firebaseio.com/",
+            projectId: "first-dc645",
+            storageBucket: "first-dc645.appspot.com",
+            messagingSenderId: "723518346868",
+            appId: "1:723518346868:web:cebec254c6499ae7aea321"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        async function fetchDietDetails() {
+            const dietRef = ref(db, "diets");
+
+            try {
+                const snapshot = await get(dietRef);
+                const dietList = document.getElementById("dietList");
+                dietList.innerHTML = ""; // Clear previous data
+
+                if (snapshot.exists()) {
+                    snapshot.forEach(planSnapshot => {
+                        let data = planSnapshot.val();
+                        let row = `<tr>
+                            <td>${data.memberName}</td>
+                            <td>${data.dietPlan}</td>
+                            <td>${data.calories} kcal</td>
+                            <td>${data.mealTime}</td>
+                        </tr>`;
+                        dietList.innerHTML += row;
+                    });
+                } else {
+                    dietList.innerHTML = "<tr><td colspan='4'>No diet details available.</td></tr>";
+                }
+            } catch (error) {
+                console.error("Error loading data:", error);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", fetchDietDetails);
+    </script>
+</body>
+</html>

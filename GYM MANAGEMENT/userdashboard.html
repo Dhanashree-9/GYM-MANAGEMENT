@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getFirestore, collection, doc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkrX7SaZYyPPwTnDTH30VTx11eSyzfNM4",
+            authDomain: "first-dc645.firebaseapp.com",
+            databaseURL: "https://first-dc645-default-rtdb.firebaseio.com",
+            projectId: "first-dc645",
+            storageBucket: "first-dc645.appspot.com",
+            messagingSenderId: "723518346868",
+            appId: "1:723518346868:web:cebec254c6499ae7aea321"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function fetchDietDetails() {
+            try {
+                const docRef = doc(db, "userDiet", "currentDiet");
+                const docSnap = await getDoc(docRef);
+                document.getElementById("diet-info").innerText = docSnap.exists() ? docSnap.data().dietPlan : "No diet details available.";
+            } catch (error) {
+                console.error("Error fetching diet details:", error);
+            }
+        }
+
+        async function fetchNotifications() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "adminNotifications"));
+                let notificationsHTML = "";
+                querySnapshot.forEach((doc) => {
+                    notificationsHTML += `<div class='message-box'>${doc.data().message}</div>`;
+                });
+                document.getElementById("notifications-list").innerHTML = notificationsHTML || "No new notifications.";
+            } catch (error) {
+                console.error("Error fetching notifications:", error);
+            }
+        }
+
+        async function fetchFeeDetails() {
+            try {
+                const docRef = doc(db, "userFees", "feeDetails");
+                const docSnap = await getDoc(docRef);
+                document.getElementById("fee-info").innerText = docSnap.exists() ? "Assigned Fee: " + docSnap.data().amount : "No fee details available.";
+            } catch (error) {
+                console.error("Error fetching fee details:", error);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchDietDetails();
+            fetchNotifications();
+            fetchFeeDetails();
+        });
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            font-family: Arial, sans-serif;
+            background: #1e1e1e;
+            color: white;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            position: fixed;
+            left: -250px;
+            top: 0;
+            transition: 0.3s;
+            padding-top: 60px;
+        }
+        .sidebar a {
+            padding: 15px 20px;
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .menu-btn {
+            font-size: 24px;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: none;
+            border: none;
+            color: white;
+        }
+        .content {
+            margin-left: 30px;
+            width: 100%;
+            padding: 50px;
+            text-align: center;
+        }
+        .section {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+        .message-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .square-btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar" class="sidebar">
+        <a href="userDashboard.html">🏠 Dashboard</a>
+        <a href="userDietDetails.html">🥗 Diet Details</a>
+        <a href="userNotification.html">🔔 Notifications</a>
+        <a href="userAssignedFee.html">💰 Assigned Fee</a>
+        <a href="index.html">🚪 Logout</a>
+    </div>
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <div class="content">
+        <h1>User Dashboard</h1>
+        <div id="dashboard" class="section active">
+            <p>🏠 Welcome to your dashboard! Manage your fitness journey here.</p>
+            <button class="square-btn" onclick="navigateTo('challenges.html')">🏆 Challenges</button>
+          
+            <button class="square-btn" onclick="navigateTo('viewUserProgress.html')">📢 Share Progress</button>
+           
+        </div>
+        <div id="diet" class="section">
+            <h2>🥗 User Diet Details</h2>
+            <div id="diet-info" class="message-box">Loading diet details...</div>
+        </div>
+        <div id="notifications" class="section">
+            <h2>🔔 Notifications</h2>
+            <div id="notifications-list" class="message-box">No notifications yet.</div>
+        </div>
+        <div id="fee" class="section">
+            <h2>💰 Assigned Fee</h2>
+            <div id="fee-info" class="message-box">Loading fee details...</div>
+        </div>
+    </div>
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("active");
+        }
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
+</body>
+</html>

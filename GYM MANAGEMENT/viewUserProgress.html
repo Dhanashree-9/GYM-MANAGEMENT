@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Progress</title>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+        import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+        // ✅ Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkrX7SaZYyPPwTnDTH30VTx11eSyzfNM4",
+            authDomain: "first-dc645.firebaseapp.com",
+            databaseURL: "https://first-dc645-default-rtdb.firebaseio.com",
+            projectId: "first-dc645",
+            storageBucket: "first-dc645.appspot.com",
+            messagingSenderId: "723518346868",
+            appId: "1:723518346868:web:cebec254c6499ae7aea321"
+        };
+
+        // ✅ Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        let userEmail = "";
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        userEmail = user.email;
+        document.getElementById("user-email").innerText = userEmail;
+        fetchProgress(); // Fetch progress on login
+    } else {
+        window.location.href = "login.html"; // Redirect to login if not authenticated
+    }
+});
+
+// ✅ Function to Send Progress
+function sendProgress() {
+    const userName = document.getElementById("user-name").value.trim();
+    const progressInput = document.getElementById("progress-input").value.trim();
+    const progressValue = document.getElementById("progress-value").value.trim();
+
+    // ✅ Ensure all fields are filled before submission
+    if (!userName || !progressInput || !progressValue) {
+        alert("All fields are required!");
+        return;
+    }
+
+    const userKey = userEmail.replace(/\./g, "_"); // Convert email to a valid key
+    const progressRef = ref(database, `userProgress/${userKey}`);
+
+    push(progressRef, {
+        name: userName,
+        email: userEmail,
+        message: progressInput,
+        value: progressValue,
+        timestamp: new Date().toISOString(),
+        adminReply: "", // Admin reply initially empty
+        credits: 0  // Initial credits
+    });
+
+    // ✅ Clear input fields after submission
+    document.getElementById("progress-input").value = "";
+    document.getElementById("progress-value").value = "";
+}
+
+// ✅ Fetch Progress with Admin Reply & Credits
+function fetchProgress() {
+    const userKey = userEmail.replace(/\./g, "_");
+    const progressRef = ref(database, `userProgress/${userKey}`);
+
+    onValue(progressRef, (snapshot) => {
+        const progressList = document.getElementById("progress-list");
+        progressList.innerHTML = ""; // Clear previous entries
+
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const data = childSnapshot.val();
+
+                const progressItem = document.createElement("div");
+                progressItem.classList.add("progress-box");
+
+                progressItem.innerHTML = `
+                    <p><strong>Name:</strong> ${data.name}</p>
+                    <p><strong>Progress:</strong> ${data.message}</p>
+                    <p><strong>Value:</strong> ${data.value}</p>
+                    <p><strong>Admin Reply:</strong> ${data.adminReply || "Pending"}</p>
+                    <p><strong>Credits Earned:</strong> ${data.credits || 0}</p>
+                `;
+
+                progressList.appendChild(progressItem);
+            });
+        } else {
+            progressList.innerHTML = "<p>No progress recorded yet.</p>";
+        }
+    });
+}
+
+// ✅ Attach functions to `window`
+window.sendProgress = sendProgress;
+
+
+    </script>
+
+    <style>
+        body { font-family: Arial, sans-serif; background: #222; color: white; text-align: center; padding: 20px; }
+        .progress-box { background: rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 10px; margin: 10px auto; width: 50%; }
+        input, button { margin: 10px; padding: 10px; border-radius: 5px; }
+        button { cursor: pointer; background: #28a745; color: white; border: none; padding: 10px 15px; }
+        button:hover { background: #218838; }
+    </style>
+</head>
+<body>
+
+    <h2>💪 Track Your Gym Progress</h2>
+
+    <p><strong>📧 Your Email:</strong> <span id="user-email">Loading...</span></p>
+    <input type="text" id="user-name" placeholder="Enter your name">
+    <input type="text" id="progress-input" placeholder="Enter progress (e.g., 30 min running)">
+    <input type="number" id="progress-value" placeholder="Progress (1-100)">
+    <button onclick="sendProgress()">Submit Progress</button>
+
+    <h3>📊 Your Progress</h3>
+    <div id="progress-list"></div>
+
+</body>
+</html>

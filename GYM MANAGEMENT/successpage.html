@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/dollar.png" type="image/png" sizes="16x16">
+    <title>Payment Success</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #dcf0fa;
+        }
+
+        .container {
+            max-width: 380px;
+            margin: 50px auto;
+            overflow: hidden;
+        }
+
+        .printer-top {
+            border: 6px solid #666;
+            height: 6px;
+            border-bottom: 0;
+            border-radius: 6px 6px 0 0;
+            background: #333;
+        }
+
+        .printer-bottom {
+            border: 6px solid #666;
+            height: 6px;
+            border-top: 0;
+            border-radius: 0 0 6px 6px;
+            background: #333;
+        }
+
+        .paper-container {
+            position: relative;
+            overflow: hidden;
+            height: 467px;
+        }
+
+        .paper {
+            background: #fff;
+            font-family: 'Poppins', sans-serif;
+            height: 447px;
+            position: absolute;
+            margin: 0 12px;
+            margin-top: -12px;
+            animation: print 5s ease-in-out infinite;
+        }
+
+        .main-contents {
+            margin: 0 12px;
+            padding: 24px;
+        }
+
+        .jagged-edge {
+            height: 20px;
+            width: 100%;
+            background: linear-gradient(45deg,
+                    transparent 33.333%,
+                    #ffffff 33.333%,
+                    #ffffff 66.667%,
+                    transparent 66.667%),
+                linear-gradient(-45deg,
+                    transparent 33.333%,
+                    #ffffff 33.333%,
+                    #ffffff 66.667%,
+                    transparent 66.667%);
+            background-size: 16px 40px;
+            background-position: 0 -20px;
+        }
+
+        .success-icon {
+            text-align: center;
+            font-size: 48px;
+            height: 72px;
+            background: #359d00;
+            border-radius: 50%;
+            width: 72px;
+            margin: 16px auto;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-title {
+            font-size: 22px;
+            text-align: center;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .success-description {
+            font-size: 15px;
+            text-align: center;
+            color: #999;
+            margin-bottom: 24px;
+        }
+
+        .order-details {
+            text-align: center;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .order-number {
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            font-size: 48px;
+            padding: 8px 0;
+            margin-bottom: 24px;
+        }
+
+        .complement {
+            font-size: 18px;
+            color: #32a852;
+        }
+
+        @keyframes print {
+            0% {
+                transform: translateY(-90%);
+            }
+
+            100% {
+                transform: translateY(0%);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="printer-top"></div>
+
+        <div class="paper-container">
+            <div class="printer-bottom"></div>
+
+            <div class="paper">
+                <div class="main-contents">
+                    <div class="success-icon">&#10004;</div>
+                    <div class="success-title">Payment Complete</div>
+                    <div class="success-description">
+                        Thank you for your payment! You will receive an email confirmation shortly.
+                    </div>
+                    <div class="order-details">
+                        <div class="order-number-label">Transaction ID</div>
+                        <div class="order-number">123456789</div>
+                        <div class="complement">Thank You!</div>
+                    </div>
+                </div>
+                <div class="jagged-edge"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

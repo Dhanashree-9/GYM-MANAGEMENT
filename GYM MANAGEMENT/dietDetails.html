@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            display: inline-block;
+            width: 80%;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            color: white;
+        }
+        th, td {
+            border: 1px solid white;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: darkred;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        button {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: darkred;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Diet Details</h1>
+        <p>Manage diet plans for members here.</p>
+
+        <div>
+            <input type="text" id="memberName" placeholder="Member Name">
+            <input type="text" id="dietPlan" placeholder="Diet Plan">
+            <input type="number" id="calories" placeholder="Calories">
+            <input type="text" id="mealTime" placeholder="Meal Timing">
+            <button id="addDietPlanBtn">Add Diet Plan</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Member Name</th>
+                    <th>Diet Plan</th>
+                    <th>Calories</th>
+                    <th>Meal Timing</th>
+                </tr>
+            </thead>
+            <tbody id="dietList">
+                <!-- Dynamic data will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getDatabase, ref, set, get, push } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkrX7SaZYyPPwTnDTH30VTx11eSyzfNM4",
+            authDomain: "first-dc645.firebaseapp.com",
+            databaseURL: "https://first-dc645-default-rtdb.firebaseio.com/",
+            projectId: "first-dc645",
+            storageBucket: "first-dc645.appspot.com",
+            messagingSenderId: "723518346868",
+            appId: "1:723518346868:web:cebec254c6499ae7aea321"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Function to load diet plans from Firebase
+        async function loadDietPlans() {
+            const dietRef = ref(db, "diets");
+            const snapshot = await get(dietRef);
+            let dietList = document.getElementById("dietList");
+            dietList.innerHTML = "";
+
+            if (snapshot.exists()) {
+                snapshot.forEach(planSnapshot => {
+                    let data = planSnapshot.val();
+                    let row = `<tr>
+                        <td>${data.memberName}</td>
+                        <td>${data.dietPlan}</td>
+                        <td>${data.calories} kcal</td>
+                        <td>${data.mealTime}</td>
+                    </tr>`;
+                    dietList.innerHTML += row;
+                });
+            } else {
+                dietList.innerHTML = "<tr><td colspan='4'>No diet plans available</td></tr>";
+            }
+        }
+
+        // Function to add a diet plan to Firebase
+        function addDietPlan() {
+            let memberName = document.getElementById("memberName").value.trim();
+            let plan = document.getElementById("dietPlan").value.trim();
+            let calories = document.getElementById("calories").value.trim();
+            let mealTime = document.getElementById("mealTime").value.trim();
+
+            if (!memberName || !plan || !calories || !mealTime) {
+                alert("Please fill out all fields.");
+                return;
+            }
+
+            // Save to Firebase
+            const newDietRef = push(ref(db, "diets"));
+            set(newDietRef, {
+                memberName: memberName,
+                dietPlan: plan,
+                calories: calories,
+                mealTime: mealTime
+            }).then(() => {
+                alert("Diet plan added successfully!");
+                document.getElementById("memberName").value = "";
+                document.getElementById("dietPlan").value = "";
+                document.getElementById("calories").value = "";
+                document.getElementById("mealTime").value = "";
+                loadDietPlans();
+            }).catch(error => {
+                console.error("Error adding diet plan: ", error);
+            });
+        }
+
+        // Attach event listener to button (since inline `onclick` won't work in modules)
+        document.getElementById("addDietPlanBtn").addEventListener("click", addDietPlan);
+
+        // Load diet plans when page loads
+        window.addEventListener("load", loadDietPlans);
+    </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #222;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            color: white;
+        }
+        th, td {
+            border: 1px solid white;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: darkred;
+        }
+        button {
+            background: red;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: darkred;
+        }
+        input {
+            padding: 10px;
+            width: 50%;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Active Members</h2>
+        <input type="text" id="searchActive" placeholder="Search Active Members" onkeyup="searchMembers('memberList', 'searchActive')">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Age</th>
+                    <th>Assigned Fee</th>
+                </tr>
+            </thead>
+            <tbody id="memberList"></tbody>
+        </table>
+
+        <h2>Deleted Members</h2>
+        <input type="text" id="searchDeleted" placeholder="Search Deleted Members" onkeyup="searchMembers('deletedList', 'searchDeleted')">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Age</th>
+                    <th>Assigned Fee</th>
+                </tr>
+            </thead>
+            <tbody id="deletedList"></tbody>
+        </table>
+
+        <button onclick="goBack()">Back</button>
+    </div>
+
+    <script>
+        function loadMembers() {
+            let members = JSON.parse(localStorage.getItem("members")) || [];
+            let deletedMembers = JSON.parse(localStorage.getItem("deletedMembers")) || [];
+
+            let memberList = document.getElementById("memberList");
+            let deletedList = document.getElementById("deletedList");
+
+            memberList.innerHTML = "";
+            deletedList.innerHTML = "";
+
+            if (members.length === 0) {
+                memberList.innerHTML = "<tr><td colspan='4'>No active members</td></tr>";
+            } else {
+                members.forEach(member => {
+                    let row = `<tr>
+                        <td>${member.name}</td>
+                        <td>${member.email}</td>
+                        <td>${member.age}</td>
+                        <td>${member.fee || 'N/A'}</td>
+                    </tr>`;
+                    memberList.innerHTML += row;
+                });
+            }
+
+            if (deletedMembers.length === 0) {
+                deletedList.innerHTML = "<tr><td colspan='4'>No deleted members</td></tr>";
+            } else {
+                deletedMembers.forEach(member => {
+                    let row = `<tr>
+                        <td>${member.name}</td>
+                        <td>${member.email}</td>
+                        <td>${member.age}</td>
+                        <td>${member.fee || 'N/A'}</td>
+                    </tr>`;
+                    deletedList.innerHTML += row;
+                });
+            }
+        }
+
+        function searchMembers(tableId, searchId) {
+            let input = document.getElementById(searchId).value.toLowerCase();
+            let table = document.getElementById(tableId);
+            let rows = table.getElementsByTagName("tr");
+
+            for (let i = 0; i < rows.length; i++) {
+                let cells = rows[i].getElementsByTagName("td");
+                let match = false;
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j] && cells[j].innerText.toLowerCase().includes(input)) {
+                        match = true;
+                        break;
+                    }
+                }
+                rows[i].style.display = match ? "" : "none";
+            }
+        }
+
+        function goBack() {
+            window.location.href = "adminDashboard.html";
+        }
+
+        window.onload = loadMembers;
+    </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            font-family: Arial, sans-serif;
+            background: #222;
+            color: white;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #333;
+            padding-top: 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: 0.3s ease-in-out;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar ul li:hover {
+            background: #555;
+        }
+
+        /* Highlight active page */
+        .sidebar ul li.active {
+            background: darkred;
+            font-weight: bold;
+        }
+
+        /* Main Content Styling */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+            transition: 0.3s;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        /* Sidebar Toggle Button */
+        .toggle-btn {
+            position: absolute;
+            left: 260px;
+            top: 20px;
+            cursor: pointer;
+            font-size: 24px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+
+        /* Hide sidebar when toggled */
+        .sidebar.hide {
+            left: -250px;
+        }
+
+        .main-content.full {
+            margin-left: 0;
+        }
+
+        /* Logout Button */
+        button {
+            background-color: red;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            border: none;
+            font-size: 18px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <h2>Admin Panel</h2>
+        <ul>
+            <li onclick="navigateTo('addMember.html')">Add Member</li>
+            <li onclick="navigateTo('deleteMember.html')">Delete Member</li>
+            <li onclick="navigateTo('updateMember.html')">Update Member</li>
+            <li onclick="navigateTo('assignFee.html')">Assign Fee Package</li>
+            <li onclick="navigateTo('assignNotification.html')">Assign Notification</li>
+            <li onclick="navigateTo('dietDetails.html')">Diet Details</li>
+            <li onclick="navigateTo('managechallenges.html')">Manage Account</li>
+            <li onclick="navigateTo('viewUserProgress.html')">View User Progress</li>
+          
+            <li class="active" onclick="navigateTo('history.html')">History</li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+        <div class="container">
+            <h1>Admin Dashboard</h1>
+            <p>Welcome, Admin! Manage your gym here.</p>
+            
+            <div class="section">
+                <h2>Manage Account</h2>
+                <p>Update and secure your account settings. (challenge the User by assigning the task)</p>
+                <button onclick="navigateTo('managechallenges.html')">Go to Manage Account</button>
+            </div>
+            
+           
+
+            <div class="section">
+                <h2>View User Progress</h2>
+                <p>Track user progress and performance metrics.</p>
+                <button onclick="navigateTo('viewadminprogress.html')">Go to View User Progress</button>
+            </div>
+            
+          
+            
+         
+            
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Sidebar
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("hide");
+            document.getElementById("mainContent").classList.toggle("full");
+        }
+
+        // Navigate to new pages
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        // Logout Function
+        function logout() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+</body>
+</html>

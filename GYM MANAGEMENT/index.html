@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Homepage</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 1s ease-in-out;
+            overflow: hidden;
+        }
+
+        /* Hamburger Menu */
+       /* Hamburger Menu Icon */
+.menu-icon {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 10;
+    color: white; /* Makes the icon visible on dark backgrounds */
+    background: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out;
+}
+
+.menu-icon:hover {
+    background: rgba(255, 255, 255, 0.3); /* Lighter background on hover */
+}
+
+/* Side Navigation Menu */
+.nav-menu {
+    position: fixed;
+    top: 0;
+    left: -250px; /* Initially hidden off-screen */
+    width: 250px;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    padding-top: 60px;
+    transition: left 0.3s ease-in-out; /* Smooth sliding effect */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Navigation Links */
+.nav-menu a {
+    padding: 15px;
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    display: block;
+    transition: background 0.2s ease-in-out;
+    width: 100%;
+    text-align: center;
+}
+
+.nav-menu a:hover {
+    background: #444; /* Changes background color when hovered */
+}
+
+/* Close Button for Menu */
+.close-menu {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 30px;
+    cursor: pointer;
+    color: white;
+}
+
+
+        /* Moving Text (Letter Train) */
+        .moving-text {
+            font-size: 40px;
+            font-weight: bold;
+            color: rgb(216, 175, 12);
+            white-space: nowrap;
+            position: absolute;
+            top: 50px;
+            overflow: hidden;
+            width: 100%;
+            text-transform: uppercase;
+        }
+
+        .moving-text span {
+            display: inline-block;
+            animation: moveText 10s linear infinite;
+        }
+
+        @keyframes moveText {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Container Styling */
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 90%;
+            width: 400px;
+        }
+
+        button, select {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        select {
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        .login {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .signup {
+            background-color: #007bff;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            p {
+                font-size: 16px;
+            }
+            button, select {
+                font-size: 16px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hamburger Menu -->
+    <div class="menu-icon" onclick="openMenu()">☰</div>
+    <div class="nav-menu" id="navMenu">
+        <span class="close-menu" onclick="closeMenu()">×</span>
+        
+   
+        <a href="sections.html?section=about">About</a>
+        <a href="sections.html?section=services">Services</a>
+        <a href="sections.html?section=contact">Contact Us</a>
+    </div>    
+    
+
+    <!-- Moving Highlight Text -->
+    <div class="moving-text">
+        <span>Welcome to GoldenHour Gym - Your Fitness Destination! 🚀🏋️‍♂️🔥</span>
+    </div>
+
+    <div class="container">
+        <h1>Welcome to GoldenHour Gym</h1>
+        <p>Your fitness journey starts here!</p>
+
+        <label for="role">Select Role:</label>
+        <select id="role">
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+           
+        </select>
+        
+        <button class="login" onclick="navigateTo('login')">Login</button>
+        <button class="signup" onclick="navigateTo('signup')">Sign Up</button>
+    </div>
+
+    <script>
+        function navigateTo(page) {
+            const role = document.getElementById("role").value;
+            window.location.href = page + ".html?role=" + role;
+        }
+
+        function openMenu() {
+            document.getElementById("navMenu").style.left = "0";
+        }
+
+        function closeMenu() {
+            document.getElementById("navMenu").style.left = "-250px";
+        }
+
+        // Slideshow Background
+        const images = [
+            'https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1920',
+            'https://cdn-blog.zameen.com/blog/wp-content/uploads/2019/06/cover-image-45-1.jpg',
+            'https://www.cityofsydney.nsw.gov.au/-/media/corporate/images/places-and-spaces/gyms/gymslistingimage.jpg?h=1365&w=2048&hash=4343DE1049A0DC6E7B120D432D19316F'
+        ];
+        let currentIndex = 0;
+        function changeBackground() {
+            document.body.style.backgroundImage = `url('${images[currentIndex]}')`;
+            currentIndex = (currentIndex + 1) % images.length;
+        }
+        changeBackground(); // Initial call
+        setInterval(changeBackground, 3000); // Change every 3 seconds
+    </script>
+
+<script src="firebase.js" type="module"></script>
+<footer style="position: absolute; bottom: 10px; color: white; font-size: 14px;">
+    © 2025 GoldenHour Gym. All rights reserved.
+</footer>
+
+
+</body>
+</html>

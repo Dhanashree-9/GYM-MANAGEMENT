@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - View Progress</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        #progress-list {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .progress-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
+            position: relative;
+            text-align: left;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .progress-box:hover {
+            transform: scale(1.02);
+            background: #f9f9f9;
+        }
+
+        progress {
+            width: 100%;
+            height: 10px;
+        }
+
+        input {
+            width: calc(50% - 10px);
+            padding: 5px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 8px 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: red;
+        }
+
+        .delete-btn:hover {
+            color: darkred;
+        }
+    </style>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+        // ✅ Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkrX7SaZYyPPwTnDTH30VTx11eSyzfNM4",
+            authDomain: "first-dc645.firebaseapp.com",
+            databaseURL: "https://first-dc645-default-rtdb.firebaseio.com",
+            projectId: "first-dc645",
+            storageBucket: "first-dc645.appspot.com",
+            messagingSenderId: "723518346868",
+            appId: "1:723518346868:web:cebec254c6499ae7aea321"
+        };
+
+        // ✅ Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // ✅ Load All User Progress
+        function loadAllProgress() {
+            const progressRef = ref(database, `userProgress/`);
+            onValue(progressRef, (snapshot) => {
+                const progressContainer = document.getElementById("progress-list");
+                progressContainer.innerHTML = "";
+
+                if (!snapshot.exists()) {
+                    progressContainer.innerHTML = "<p>No progress recorded yet.</p>";
+                    return;
+                }
+
+                snapshot.forEach((userSnapshot) => {
+                    userSnapshot.forEach((childSnapshot) => {
+                        const data = childSnapshot.val();
+                        const key = childSnapshot.key;
+
+                        if (!data.name || !data.email || !data.value) return; // Ignore null values
+
+                        const progressDiv = document.createElement("div");
+                        progressDiv.classList.add("progress-box");
+                        progressDiv.id = `progress-${key}`;
+
+                        progressDiv.innerHTML = `
+                            <button class="delete-btn" onclick="deleteProgress('${userSnapshot.key}', '${key}')">❌</button>
+                            <strong>👤 Name:</strong> ${data.name} <br>
+                            <strong>📧 Email:</strong> ${data.email} <br>
+                            <strong>📊 Progress:</strong> ${data.message} (${data.value}%)<br>
+                            <progress value="${data.value}" max="100"></progress><br>
+                            <strong>👨‍⚖️ Admin Reply:</strong> <span id="reply-${key}">${data.adminReply || "Waiting for reply..."}</span> <br>
+                            <strong>⭐ Credits Earned:</strong> <span id="credits-${key}">${data.credits || "Not assigned yet"}</span> <br>
+                            
+                            <input type="text" id="admin-reply-${key}" placeholder="Enter admin reply">
+                            <input type="number" id="admin-credits-${key}" placeholder="Credits (0-100)">
+                            <button onclick="updateProgress('${userSnapshot.key}', '${key}')">Update</button>
+                        `;
+                        progressContainer.appendChild(progressDiv);
+                    });
+                });
+            });
+        }
+
+        // ✅ Update Admin Reply & Credits
+        function updateProgress(userKey, entryKey) {
+            const replyInput = document.getElementById(`admin-reply-${entryKey}`).value;
+            const creditsInput = document.getElementById(`admin-credits-${entryKey}`).value;
+
+            if (creditsInput === "") {
+                alert("Credits are required!");
+                return;
+            }
+
+            const updateData = { credits: creditsInput };
+            if (replyInput.trim() !== "") updateData.adminReply = replyInput;
+
+            update(ref(database, `userProgress/${userKey}/${entryKey}`), updateData)
+                .then(() => {
+                    document.getElementById(`reply-${entryKey}`).textContent = replyInput || "Waiting for reply...";
+                    document.getElementById(`credits-${entryKey}`).textContent = creditsInput;
+                    alert("Successfully updated!");
+                })
+                .catch(error => alert("Error updating: " + error.message));
+        }
+
+        // ✅ Delete User Progress (Only if data is valid)
+        function deleteProgress(userKey, entryKey) {
+    remove(ref(database, `userProgress/${userKey}/${entryKey}`))
+        .then(() => {
+            let progressElement = document.getElementById(`progress-${entryKey}`);
+            if (progressElement) {
+                progressElement.remove();
+            }
+        })
+        .catch(error => alert("Error deleting: " + error.message));
+}
+
+
+        // ✅ Load on Page Load
+        window.onload = loadAllProgress;
+        window.updateProgress = updateProgress;
+        window.deleteProgress = deleteProgress;
+    </script>
+
+</head>
+<body>
+
+    <h2>👨‍⚖️ Admin Panel - View User Progress</h2>
+    <div id="progress-list"></div>
+
+</body>
+</html>

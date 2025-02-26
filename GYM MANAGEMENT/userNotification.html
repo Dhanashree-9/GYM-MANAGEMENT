@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Notifications</title>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+
+        // ✅ Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkrX7SaZYyPPwTnDTH30VTx11eSyzfNM4",
+            authDomain: "first-dc645.firebaseapp.com",
+            databaseURL: "https://first-dc645-default-rtdb.firebaseio.com",
+            projectId: "first-dc645",
+            storageBucket: "first-dc645.appspot.com",
+            messagingSenderId: "723518346868",
+            appId: "1:723518346868:web:cebec254c6499ae7aea321"
+        };
+
+        // ✅ Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+
+        // ✅ Function to Fetch User Notifications Automatically
+        function loadNotifications(userEmail) {
+            if (!userEmail) return;
+            const userKey = userEmail.replace(/\./g, "_"); // Convert email to Firebase key format
+            const userRef = ref(database, `notifications/${userKey}`);
+
+            onValue(userRef, (snapshot) => {
+                const notificationsContainer = document.getElementById("notifications-list");
+                notificationsContainer.innerHTML = ""; // Clear previous content
+
+                if (!snapshot.exists()) {
+                    notificationsContainer.innerHTML = "<p>No notifications.</p>";
+                    return;
+                }
+
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    const notificationDiv = document.createElement("div");
+                    notificationDiv.classList.add("message-box");
+                    notificationDiv.innerHTML = `<strong>📢 Notification:</strong> ${data.message}`;
+                    notificationsContainer.appendChild(notificationDiv);
+                });
+            });
+        }
+
+        // ✅ Automatically Fetch Notifications for Logged-In User
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById("userEmail").textContent = `Logged in as: ${user.email}`;
+                loadNotifications(user.email);
+            } else {
+                document.getElementById("userEmail").textContent = "Not logged in";
+            }
+        });
+
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #222;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .message-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px auto;
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🔔 User Notifications</h2>
+    <p id="userEmail">Fetching user...</p>
+
+    <div id="notifications-list"></div>
+
+</body>
+</html>

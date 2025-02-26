@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Assign Notifications</title>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+        // ✅ Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkrX7SaZYyPPwTnDTH30VTx11eSyzfNM4",
+            authDomain: "first-dc645.firebaseapp.com",
+            databaseURL: "https://first-dc645-default-rtdb.firebaseio.com",
+            projectId: "first-dc645",
+            storageBucket: "first-dc645.appspot.com",
+            messagingSenderId: "723518346868",
+            appId: "1:723518346868:web:cebec254c6499ae7aea321"
+        };
+
+        // ✅ Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // ✅ Function to Send Notification
+        window.sendNotification = function () {
+            const userEmail = document.getElementById("userEmail").value.trim();
+            const message = document.getElementById("message").value.trim();
+
+            if (userEmail === "" || message === "") {
+                alert("Please enter a valid email and message.");
+                return;
+            }
+
+            // Convert email to a safe Firebase key format
+            const userKey = userEmail.replace(/\./g, "_");
+
+            // Reference to user-specific notifications
+            const userRef = ref(database, `notifications/${userKey}`);
+
+            // Create new notification entry
+            const newNotifRef = push(userRef);
+            set(newNotifRef, { message: message })
+                .then(() => {
+                    alert("Notification sent successfully!");
+                    document.getElementById("message").value = ""; // Clear input
+                })
+                .catch((error) => {
+                    console.error("Error sending notification:", error);
+                });
+        };
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        input, button, textarea {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+        }
+        button {
+            background: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: darkgreen;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>📢 Admin - Send Notification</h2>
+
+    <input type="email" id="userEmail" placeholder="Enter User Email" />
+    <br>
+    <textarea id="message" placeholder="Enter Notification Message" rows="4"></textarea>
+    <br>
+    <button onclick="sendNotification()">Send Notification</button>
+
+</body>
+</html>
